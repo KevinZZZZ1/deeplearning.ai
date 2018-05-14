@@ -62,7 +62,7 @@ def train(fileurl):
    
 #def predict():
     
-x,y = loadDataSet('F:/kevin/ex1data1.txt')
+x,y = loadDataSet('ex1data1.txt')
 plt.plot(x,y,'ro')
 plt.show()
 
