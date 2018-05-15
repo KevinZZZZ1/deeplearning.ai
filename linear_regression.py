@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu May 10 11:09:43 2018
+其中：
+x∈R^(m×n),y∈R^(1×n),w∈R^((m+1)×1) 包含偏置b
+
 
 @author: kevin
 """
@@ -12,7 +15,7 @@ def gradient_descent(x,y,epsilon,learningrate=0.01):
     m = np.shape(x)[0] # 特征的个数
     n = np.shape(x)[1] # 样本点的个数
     #将w,b都初始化为零向量和0
-    w = np.zeros((m,1)) # 加1代表偏置b
+    w = np.zeros((m,1)) # 包含偏置b
     #初始的costfunction的值
     cost = costfunction(w,x,y)
     #cost function对于参数w和b的偏导数
