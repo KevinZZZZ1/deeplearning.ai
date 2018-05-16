@@ -2,6 +2,8 @@
 """
 Created on Tue May 15 16:17:31 2018
 
+斜率没有什么问题，但是偏置b始终存在问题，而且没找到 = =
+
 @author: keivn
 """
 
@@ -18,6 +20,11 @@ def sigmoid(x):
     return y
 
 
+def sigmoidGradient(w,x,y):
+    n = np.shape(x)[1] # 样本点的个数
+    dw = (np.dot(x,(sigmoid(np.dot(w.T,x))-y).T))/n
+    return dw
+    
 
 def feature_scaling(x,y):
     #进行特征缩放
@@ -50,7 +57,6 @@ def gradient_descent(x,y,epsilon,learningrate=0.01):
     #dw = dw / n
     #print("1  dw:")
     #print(dw)
-    
     dw = (np.dot(x,(sigmoid(np.dot(w.T,x))-y).T))/n
     
     print("1  dw:")
@@ -59,7 +65,7 @@ def gradient_descent(x,y,epsilon,learningrate=0.01):
     while(k < epsilon):
         w = w - learningrate*dw 
         cost = costfunction(w,x,y)
-        print(w)
+        print(cost)
         k = k + 1
         dw = (np.dot(x,(sigmoid(np.dot(w.T,x))-y).T))/n
         #dw = (np.dot(x,(y*(1-sigmoid(np.dot(w.T,x)))).T) + np.dot(x,((1-y)*sigmoid(np.dot(w.T,x))).T))/n
@@ -124,6 +130,16 @@ def y1(x1):
 plt.plot(x1, y1(x1), 'r-',linewidth=1,label='f(x)') 
 plt.show()  
 
-
+X = np.array(x).T
+Y = np.array(y).T
+bias = np.ones((1,X.shape[1])) # 处理偏置项
+X = np.concatenate((bias,X))
+test_theta = np.array([[-24], [0.2], [0.2]])
+cost = costfunction(test_theta, X, Y)
+grad = sigmoidGradient(test_theta, X, Y)
+print('Cost at test theta: {}'.format(cost))
+print('Expected cost (approx): 0.218')
+print('Gradient at test theta: {}'.format(grad))
+print('Expected gradients (approx): 0.043 2.566 2.647')
 
 
