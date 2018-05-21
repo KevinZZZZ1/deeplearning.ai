@@ -3,14 +3,14 @@
 Created on Tue May 15 16:17:31 2018
 
 斜率没有什么问题，但是偏置b始终存在问题，而且没找到 = =
-
+补充：b不对的问题好像找到了，问题似乎是出在前期数据处理时进行的特征缩放，把特征缩放去掉之后，经过100000次的迭代得到了正确的解，至于原因还没弄清楚
 @author: keivn
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
-
+import scipy.optimize as op
 
 
 def sigmoid(x):
@@ -24,7 +24,6 @@ def sigmoidGradient(w,x,y):
     n = np.shape(x)[1] # 样本点的个数
     dw = (np.dot(x,(sigmoid(np.dot(w.T,x))-y).T))/n
     return dw
-    
 
 def feature_scaling(x,y):
     #进行特征缩放
@@ -41,8 +40,10 @@ def feature_scaling(x,y):
     return x_,y_
 
 
-def gradient_descent(x,y,epsilon,learningrate=0.01):
-    m = np.shape(x)[0] # 特征的个数
+
+
+def gradient_descent(x,y,epsilon,learningrate=0.001):
+    m = np.shape(x)[0] # 特征的个数(已经包括偏置b)
     n = np.shape(x)[1] # 样本点的个数
     #将w,b都初始化为零向量和0
     w = np.zeros((m,1)) 
@@ -58,13 +59,15 @@ def gradient_descent(x,y,epsilon,learningrate=0.01):
     #print("1  dw:")
     #print(dw)
     dw = (np.dot(x,(sigmoid(np.dot(w.T,x))-y).T))/n
-    
-    print("1  dw:")
-    print(dw)
     k = 0
     while(k < epsilon):
         w = w - learningrate*dw 
         cost = costfunction(w,x,y)
+        print('w:')
+        print(w)
+        print('dw:')
+        print(dw)
+        print('cost:')
         print(cost)
         k = k + 1
         dw = (np.dot(x,(sigmoid(np.dot(w.T,x))-y).T))/n
@@ -100,13 +103,10 @@ def train(fileurl):
     x_,y_ = loadDataSet(file)
     x = np.array(x_).T
     y = np.array(y_).T
-    #进行特征缩放(feature scaling)
-    x,y = feature_scaling(x,y)
-    
     bias = np.ones((1,x.shape[1])) # 处理偏置项
     x = np.concatenate((x,bias))
     
-    w = gradient_descent(x,y,50)
+    w = gradient_descent(x,y,100000)
     return w
 
     
@@ -117,9 +117,9 @@ for i in range(m):
     if(y[i][0]==1.0): plt.plot(x[i][0],x[i][1],'go')
 plt.show()
 
-w1,w2,b = train('ex2data1.txt')
+w1,w2,b1 = train('ex2data1.txt')
 w = -w1/w2
-b = -b/w2
+b = -b1/w2
 x1 = np.linspace(30,100,90)  
 for i in range(m):
     if(y[i][0]==0.0): plt.plot(x[i][0],x[i][1],'ro')
@@ -141,5 +141,7 @@ print('Cost at test theta: {}'.format(cost))
 print('Expected cost (approx): 0.218')
 print('Gradient at test theta: {}'.format(grad))
 print('Expected gradients (approx): 0.043 2.566 2.647')
-
+options = {'full_output': True, 'maxiter': 400}
+initial_theta = np.zeros((X.shape[0],1))
+theta, cost, _, _, _ = op.fmin(lambda t: costfunction(t, X, Y), initial_theta, **options)
 
